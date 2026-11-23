@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/cve/[id]">): Prom
 
 export default function CvePage({ params }: PageProps<"/cve/[id]">) {
   return (
-    <Suspense fallback={<div className="h-64 animate-pulse rounded-xl border border-border bg-card" />}>
+    <Suspense fallback={<div className="h-64 animate-pulse px-panel" />}>
       <CveContent params={params} />
     </Suspense>
   );
@@ -44,12 +44,12 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
             <SeverityBadge severity={cve.cvss_severity} score={cve.cvss_score} />
             {cve.in_kev && <ExploitedBadge />}
           </div>
-          <h1 className="font-mono text-3xl font-bold">{cve.id}</h1>
+          <h1 className="chroma font-pixel text-4xl font-bold tracking-wide sm:text-5xl">{cve.id}</h1>
           {cve.kev_name && <p className="mt-1 text-lg">{cve.kev_name}</p>}
         </header>
 
         {rejected ? (
-          <p className="rounded-xl border border-border bg-card p-5 text-muted">
+          <p className="px-panel p-5 text-muted">
             This CVE was rejected by its CNA — it&apos;s a duplicate or not a real vulnerability.
           </p>
         ) : parsed?.success ? (
@@ -58,8 +58,8 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
           <ExplanationLoader id={cve.id} />
         )}
 
-        <section className="rounded-xl border border-border p-5">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Official description (NVD)</h2>
+        <section className="px-panel p-5">
+          <h2 className="label mb-3 text-[11px] text-muted">Official description (NVD)</h2>
           <p className="text-sm leading-relaxed text-muted">{cve.description ?? "Not available yet."}</p>
         </section>
       </div>
@@ -76,15 +76,15 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
           ]}
         />
         {cve.in_kev && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4">
-            <p className="mb-1 font-semibold text-red-300">Known exploited (CISA KEV)</p>
+          <div className="px-panel border-pink! p-4">
+            <p className="label mb-2 text-[11px] text-pink">Known exploited (CISA KEV)</p>
             <p className="text-muted">Added {cve.kev_date_added}. Fix due {cve.kev_due_date ?? "—"}.</p>
             {cve.kev_required_action && <p className="mt-2">{cve.kev_required_action}</p>}
           </div>
         )}
         {cve.affected.length > 0 && (
-          <div className="rounded-xl border border-border p-4">
-            <p className="mb-2 font-semibold">Affected products</p>
+          <div className="px-panel p-4">
+            <p className="label mb-2 text-[11px] text-cyan">Affected products</p>
             <ul className="space-y-1 capitalize text-muted">
               {cve.affected.slice(0, 10).map((a) => (
                 <li key={a}>{a}</li>
@@ -92,11 +92,11 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
             </ul>
           </div>
         )}
-        <div className="rounded-xl border border-border p-4">
-          <p className="mb-2 font-semibold">Sources</p>
+        <div className="px-panel p-4">
+          <p className="label mb-2 text-[11px] text-cyan">Sources</p>
           <ul className="space-y-1 break-all">
             <li>
-              <a className="text-accent hover:underline" href={`https://nvd.nist.gov/vuln/detail/${cve.id}`} target="_blank" rel="noreferrer">
+              <a className="text-cyan hover:underline" href={`https://nvd.nist.gov/vuln/detail/${cve.id}`} target="_blank" rel="noreferrer">
                 NVD record
               </a>
             </li>
@@ -116,7 +116,7 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
 
 function Facts({ rows }: { rows: [string, string | null | undefined][] }) {
   return (
-    <dl className="rounded-xl border border-border p-4">
+    <dl className="px-panel p-4">
       {rows
         .filter(([, v]) => v)
         .map(([k, v]) => (

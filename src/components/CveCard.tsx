@@ -2,50 +2,47 @@ import Link from "next/link";
 import type { CveListItem } from "@/lib/cves";
 
 const SEVERITY_COLORS: Record<string, string> = {
-  CRITICAL: "bg-red-500/15 text-red-400 border-red-500/30",
-  HIGH: "bg-orange-500/15 text-orange-400 border-orange-500/30",
-  MEDIUM: "bg-yellow-500/15 text-yellow-300 border-yellow-500/30",
-  LOW: "bg-green-500/15 text-green-400 border-green-500/30",
+  CRITICAL: "border-red-400 text-red-300 bg-red-500/15",
+  HIGH: "border-orange-400 text-orange-300 bg-orange-500/15",
+  MEDIUM: "border-yellow-300 text-yellow-200 bg-yellow-500/10",
+  LOW: "border-emerald-400 text-emerald-300 bg-emerald-500/10",
 };
 
+const badge = "label inline-block border-2 px-2 py-0.5 text-[10px]";
+
 export function SeverityBadge({ severity, score }: { severity: string | null; score: number | null }) {
-  if (!severity) return <span className="rounded border border-border px-2 py-0.5 text-xs text-muted">No score yet</span>;
+  if (!severity) return <span className={`${badge} border-border text-muted`}>No score yet</span>;
   return (
-    <span className={`rounded border px-2 py-0.5 text-xs font-semibold ${SEVERITY_COLORS[severity] ?? ""}`}>
+    <span className={`${badge} ${SEVERITY_COLORS[severity] ?? "border-border"}`}>
       {severity} {score ?? ""}
     </span>
   );
 }
 
 export function ExploitedBadge() {
-  return (
-    <span className="rounded border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-300">
-      Actively exploited
-    </span>
-  );
+  return <span className={`${badge} border-pink bg-pink/15 text-pink`}>Exploited</span>;
 }
 
 export function CveCard({ cve }: { cve: CveListItem }) {
   return (
-    <Link
-      href={`/cve/${cve.id}`}
-      className="block rounded-xl border border-border bg-card p-4 transition hover:border-accent"
-    >
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span className="font-mono text-sm font-semibold">{cve.id}</span>
+    <Link href={`/cve/${cve.id}`} className="px-panel px-link block p-4">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <SeverityBadge severity={cve.cvss_severity} score={cve.cvss_score} />
         {cve.in_kev && <ExploitedBadge />}
       </div>
+      <p className="mb-1 font-pixel text-lg tracking-wide text-cyan">{cve.id}</p>
       {cve.kev_name && <p className="mb-1 text-sm font-medium">{cve.kev_name}</p>}
-      <p className="line-clamp-3 text-sm text-muted">{cve.description ?? cve.kev_description ?? "Details load when you open it."}</p>
+      <p className="line-clamp-3 text-sm text-muted">
+        {cve.description ?? cve.kev_description ?? "Details load when you open it."}
+      </p>
     </Link>
   );
 }
 
 export function CveGrid({ cves, empty }: { cves: CveListItem[]; empty: string }) {
-  if (!cves.length) return <p className="text-sm text-muted">{empty}</p>;
+  if (!cves.length) return <p className="px-panel p-4 text-sm text-muted">{empty}</p>;
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cves.map((c) => (
         <CveCard key={c.id} cve={c} />
       ))}
@@ -55,10 +52,21 @@ export function CveGrid({ cves, empty }: { cves: CveListItem[]; empty: string })
 
 export function GridSkeleton() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-32 animate-pulse rounded-xl border border-border bg-card" />
+        <div key={i} className="px-panel h-36 animate-pulse" />
       ))}
+    </div>
+  );
+}
+
+/** Section title styled as a depth marker, e.g. "▼ 40 m · Sunlit zone" */
+export function ZoneTitle({ depth, title, subtitle }: { depth: string; title: string; subtitle?: string }) {
+  return (
+    <div className="mb-4">
+      <p className="label mb-1 text-[10px] text-cyan/80">▼ {depth}</p>
+      <h2 className="font-pixel text-2xl tracking-wide">{title}</h2>
+      {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
     </div>
   );
 }

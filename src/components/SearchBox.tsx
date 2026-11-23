@@ -20,19 +20,18 @@ export function SearchBox() {
   }
 
   return (
-    <form onSubmit={submit} className="w-full max-w-xl">
-      <div className="flex gap-2">
+    <form onSubmit={submit} className="w-full max-w-2xl">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Search a CVE, e.g. CVE-2021-44228"
-          className="flex-1 rounded-lg border border-border bg-card px-4 py-3 font-mono text-sm outline-none focus:border-accent"
+          placeholder="CVE-2021-44228"
+          aria-label="CVE id"
+          className="flex-1 border-2 border-[#0b1a33] bg-[#f3fbff] px-4 py-3 font-mono text-base text-[#0b1a33] shadow-[4px_4px_0_0_rgb(11_26_51/0.5)] outline-none placeholder:text-[#0b1a33]/40 focus:border-pink"
         />
-        <button className="rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-black hover:opacity-90">
-          Explain
-        </button>
+        <button className="px-btn px-6 py-3 text-sm">▼ Dive in</button>
       </div>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm font-medium text-[#b3123f]">{error}</p>}
     </form>
   );
 }

@@ -5,8 +5,8 @@ import type { Explanation } from "@/lib/explain";
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">{title}</h2>
+    <section className="px-panel p-5">
+      <h2 className="label mb-3 text-[11px] text-cyan">{title}</h2>
       <div className="space-y-2 text-[15px] leading-relaxed">{children}</div>
     </section>
   );
@@ -26,10 +26,10 @@ function List({ items, ordered }: { items: string[]; ordered?: boolean }) {
 export function ExplanationBody({ e, reviewed }: { e: Explanation; reviewed: boolean }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-accent/40 bg-accent/5 p-5">
+      <div className="px-panel border-cyan! p-5">
         <div className="mb-2 flex flex-wrap gap-2 text-xs">
-          <span className="rounded border border-border px-2 py-0.5 capitalize text-muted">{e.difficulty}</span>
-          <span className="rounded border border-border px-2 py-0.5 text-muted">
+          <span className="label border-2 border-border px-2 py-0.5 text-[10px] text-muted">{e.difficulty}</span>
+          <span className="label border-2 border-border px-2 py-0.5 text-[10px] text-muted">
             {reviewed ? "✔ Reviewed by a human" : "AI-generated"}
           </span>
         </div>
@@ -102,14 +102,14 @@ export function ExplanationLoader({ id }: { id: string }) {
 
   if (state.status === "done") return <ExplanationBody e={state.e} reviewed={state.reviewed} />;
   if (state.status === "error")
-    return <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">{state.msg}</div>;
+    return <div className="px-panel p-5 text-sm text-muted">{state.msg}</div>;
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">
+      <div className="px-panel p-5 text-sm text-muted">
         ✨ First time someone opened this CVE — writing a simple explanation (takes ~10 seconds)…
       </div>
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-28 animate-pulse rounded-xl border border-border bg-card" />
+        <div key={i} className="h-28 animate-pulse px-panel" />
       ))}
     </div>
   );

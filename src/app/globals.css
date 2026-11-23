@@ -1,13 +1,25 @@
 @import "tailwindcss";
+@import "@fontsource/pixelify-sans/500.css";
+@import "@fontsource/pixelify-sans/700.css";
+@import "@fontsource/silkscreen/400.css";
 
-/* Temporary theme — will be replaced by the real design later. */
+/* ===== CVEStat "Deep Dive" theme ===== */
 :root {
-  --background: #0b0f14;
-  --foreground: #e6edf3;
-  --muted: #8b98a5;
-  --card: #121821;
-  --border: #223041;
-  --accent: #3fb950;
+  --sky-top: #5fb8f0;
+  --sky-bottom: #bfe8fb;
+  --sea-top: #0f5b8a;
+  --sea-mid: #0b3560;
+  --sea-deep: #061529;
+  --abyss: #02060f;
+
+  --background: #061529;
+  --foreground: #e9f5ff;
+  --muted: #9bbad1;
+  --card: rgb(8 22 44 / 0.86);
+  --border: #1f4a72;
+  --cyan: #4fd8ff;
+  --pink: #ff5c8a;
+  --accent: #4fd8ff;
 }
 
 @theme inline {
@@ -17,11 +29,143 @@
   --color-card: var(--card);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-cyan: var(--cyan);
+  --color-pink: var(--pink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixel: "Pixelify Sans", var(--font-geist-mono);
+  --font-label: "Silkscreen", var(--font-geist-mono);
 }
 
+html {
+  background: var(--sea-deep);
+}
 body {
-  background: var(--background);
   color: var(--foreground);
+  overflow-x: clip;
+}
+
+/* ---------- Water ---------- */
+.ocean {
+  background: linear-gradient(180deg, var(--sea-top) 0%, var(--sea-mid) 45%, var(--sea-deep) 100%);
+}
+/* gets darker the deeper you scroll (--depth goes 0 → 1, set by Ocean.tsx) */
+.ocean-dark {
+  background: var(--abyss);
+  opacity: calc(var(--depth, 0) * 0.75);
+  transition: opacity 0.2s linear;
+}
+.ray {
+  position: absolute;
+  top: -10%;
+  width: 90px;
+  height: 120%;
+  background: linear-gradient(180deg, rgb(191 240 255 / 0.18), transparent 70%);
+  transform: skewX(-18deg);
+  animation: shimmer 9s ease-in-out infinite;
+  opacity: calc(0.9 - var(--depth, 0));
+}
+.sand {
+  background: repeating-linear-gradient(90deg, #8a7650 0 8px, #a38c5e 8px 16px);
+  opacity: 0.55;
+}
+
+/* ---------- Sky (homepage top) ---------- */
+.sky {
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+}
+.cloud {
+  left: -20%;
+  animation: drift-cloud linear infinite;
+}
+
+/* ---------- Creatures & things ---------- */
+.swim {
+  position: absolute;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.swim-r { animation-name: swim-right; }
+.swim-l { animation-name: swim-left; }
+.bob { animation: bob 3.2s ease-in-out infinite; }
+.trash {
+  position: absolute;
+  left: -10%;
+  opacity: 0.75;
+  animation: drift-trash linear infinite;
+}
+.tumble { animation: tumble 14s linear infinite; }
+.bubble {
+  position: absolute;
+  bottom: -20px;
+  border: 1.5px solid rgb(191 240 255 / 0.55);
+  background: rgb(191 240 255 / 0.12);
+  animation: rise linear infinite;
+}
+.sway {
+  transform-origin: bottom center;
+  animation: sway 5s ease-in-out infinite;
+}
+
+@keyframes swim-right { from { transform: translateX(-15vw); } to { transform: translateX(115vw); } }
+@keyframes swim-left  { from { transform: translateX(115vw); } to { transform: translateX(-15vw); } }
+@keyframes bob        { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes sway       { 0%, 100% { transform: skewX(4deg); } 50% { transform: skewX(-4deg); } }
+@keyframes rise       { from { transform: translateY(0); opacity: 0; } 10% { opacity: 1; } to { transform: translateY(-105vh); opacity: 0; } }
+@keyframes tumble     { to { rotate: 360deg; } }
+@keyframes shimmer    { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.8; } }
+@keyframes drift-cloud { from { transform: translateX(0); } to { transform: translateX(140vw); } }
+/* visible during the first ~40% of the cycle, then off-screen → appears only "sometimes" */
+@keyframes drift-trash {
+  0%   { transform: translate(0, 0); }
+  40%  { transform: translate(125vw, 18vh); }
+  100% { transform: translate(125vw, 18vh); }
+}
+
+/* ---------- Pixel UI (in the components layer so Tailwind utilities can override) ---------- */
+@layer components {
+.px-panel {
+  background: var(--card);
+  border: 2px solid var(--border);
+  box-shadow: 4px 4px 0 0 rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(3px);
+}
+.px-link {
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.px-link:hover {
+  border-color: var(--cyan);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 rgb(0 0 0 / 0.5);
+}
+.px-btn {
+  font-family: var(--font-label);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 2px solid var(--cyan);
+  background: #0b1a33;
+  color: var(--foreground);
+  box-shadow: 0 0 0 2px #0b1a33, 0 0 12px rgb(79 216 255 / 0.35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.px-btn:hover {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px #0b1a33, 0 0 14px rgb(255 92 138 / 0.45);
+}
+/* retro "glitch" title: pink + cyan offset */
+.chroma {
+  text-shadow: -3px 0 var(--pink), 3px 0 var(--cyan);
+}
+.label {
+  font-family: var(--font-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+}
+
+/* Calm mode for people who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .swim, .bob, .trash, .tumble, .bubble, .sway, .ray, .cloud { animation: none !important; }
+  .bubble, .trash { display: none; }
 }
