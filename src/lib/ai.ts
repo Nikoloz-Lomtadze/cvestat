@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // Free-tier Gemini models, tried in order. If the first is busy (503) or rate-limited (429),
 // we wait a moment and fall back to the next one. Override with GEMINI_MODEL in Vercel.
-const MODELS = [process.env.GEMINI_MODEL || "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
+const MODELS = [process.env.GEMINI_MODEL || "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
 export const MODEL = MODELS[0];
 
 let client: GoogleGenAI | null = null;
@@ -20,7 +20,7 @@ const isBusy = (e: unknown) => /\b(503|429|UNAVAILABLE|RESOURCE_EXHAUSTED)\b/.te
 /**
  * Ask Gemini for JSON that matches a zod schema.
  * The schema is sent to Gemini ("structured output"), and the answer is validated again here.
- * Up to 4 attempts: busy errors → wait (1s, 2s, 4s) and try the backup model; broken JSON → retry.
+ * Up to 5 attempts: busy errors → wait (1s, 2s, 4s, 8s) and try the next model; broken JSON → retry.
  */
 export async function generateJson<T extends z.ZodType>(opts: {
   schema: T;
@@ -31,7 +31,7 @@ export async function generateJson<T extends z.ZodType>(opts: {
   delete jsonSchema.$schema; // Gemini doesn't accept this field
 
   let lastError: unknown;
-  for (let attempt = 0; attempt < 4; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     const model = MODELS[attempt % MODELS.length];
     try {
       const res = await gemini().models.generateContent({

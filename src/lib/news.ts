@@ -51,23 +51,58 @@ const SummariesSchema = z.object({
 });
 
 /** Fetch all feeds, keep only new articles, write a 1–2 sentence summary for each, save. */
-export async function ingestNews(): Promise<{ added: number; errors: string[] }> {
+export async function ingestNews(): Promise<{ added: number; repaired: number; errors: string[] }> {
   const errors: string[] = [];
   const all = (
     await Promise.all(FEEDS.map((f) => readFeed(f).catch((e) => (errors.push(String(e)), [] as RawItem[]))))
   ).flat();
-  if (!all.length) return { added: 0, errors };
 
   // Skip articles we already have.
   const { data: known } = await db().from("news").select("url").in("url", all.map((i) => i.url));
   const knownUrls = new Set((known ?? []).map((k) => k.url));
   const fresh = all.filter((i) => !knownUrls.has(i.url)).slice(0, 40);
-  if (!fresh.length) return { added: 0, errors };
 
-  // One AI call per 20 articles (keeps us far below free-tier limits).
+  let added = 0;
+  if (fresh.length) {
+    const summaries = await summarize(fresh, errors);
+    const rows = fresh.map((item, idx) => {
+      const summary = summaries.get(idx) ?? null;
+      return { source: item.source, title: item.title, url: item.url, published_at: item.published_at, summary, cve_ids: findCves(item.title, summary) };
+    });
+    const { error } = await db().from("news").upsert(rows, { onConflict: "url", ignoreDuplicates: true });
+    if (error) errors.push(`save: ${error.message}`);
+    else added = rows.length;
+  }
+
+  // Self-healing: articles saved earlier without a summary (AI was busy) get one now.
+  const { data: missing } = await db()
+    .from("news")
+    .select("id, title")
+    .is("summary", null)
+    .order("published_at", { ascending: false })
+    .limit(40);
+  let repaired = 0;
+  if (missing?.length) {
+    const summaries = await summarize(missing.map((m) => ({ title: m.title, snippet: "" })), errors);
+    for (const [idx, summary] of summaries) {
+      const m = missing[idx];
+      if (!m) continue;
+      const { error } = await db().from("news").update({ summary, cve_ids: findCves(m.title, summary) }).eq("id", m.id);
+      if (!error) repaired++;
+    }
+  }
+  return { added, repaired, errors };
+}
+
+function findCves(title: string, summary: string | null) {
+  return [...new Set(`${title} ${summary ?? ""}`.toUpperCase().match(/CVE-\d{4}-\d{4,}/g) ?? [])];
+}
+
+/** One AI call per 20 articles (keeps us far below free-tier limits). Returns index → summary. */
+async function summarize(items: { title: string; snippet: string }[], errors: string[]) {
   const summaries = new Map<number, string>();
-  for (let i = 0; i < fresh.length; i += 20) {
-    const batch = fresh.slice(i, i + 20);
+  for (let i = 0; i < items.length; i += 20) {
+    const batch = items.slice(i, i + 20);
     try {
       const out = await generateJson({
         schema: SummariesSchema,
@@ -77,16 +112,8 @@ export async function ingestNews(): Promise<{ added: number; errors: string[] }>
       });
       for (const s of out.items) summaries.set(s.index, s.summary);
     } catch (e) {
-      errors.push(`summary: ${e}`);
+      errors.push(`summary: ${String(e).slice(0, 200)}`);
     }
   }
-
-  const rows = fresh.map((item, idx) => {
-    const summary = summaries.get(idx) ?? null;
-    const cve_ids = [...new Set(`${item.title} ${summary ?? ""}`.toUpperCase().match(/CVE-\d{4}-\d{4,}/g) ?? [])];
-    return { source: item.source, title: item.title, url: item.url, published_at: item.published_at, summary, cve_ids };
-  });
-  const { error } = await db().from("news").upsert(rows, { onConflict: "url", ignoreDuplicates: true });
-  if (error) errors.push(`save: ${error.message}`);
-  return { added: error ? 0 : rows.length, errors };
+  return summaries;
 }
