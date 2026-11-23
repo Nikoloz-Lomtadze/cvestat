@@ -8,11 +8,12 @@ let client: SupabaseClient | null = null;
 
 export function db(): SupabaseClient {
   if (!client) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // Accept both naming styles (Vercel uses the short names, .env.local the long ones).
+    const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key)
       throw new Error(
-        `Missing env vars: ${[!url && "NEXT_PUBLIC_SUPABASE_URL", !key && "SUPABASE_SERVICE_ROLE_KEY"].filter(Boolean).join(", ")}`,
+        `Missing env vars: ${[!url && "SUPABASE_URL", !key && "SERVICE_ROLE_KEY"].filter(Boolean).join(", ")}`,
       );
     client = createClient(url, key, { auth: { persistSession: false } });
   }
