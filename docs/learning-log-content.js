@@ -149,6 +149,17 @@ module.exports = [
     "\"TTXXXXXXXEXX\",",
   ]},
 
+
+  { t: "h2", text: "Filters on /cves (danger level, exploited, period, sort, search)" },
+  { t: "bullets", items: [
+    "Filters live in the URL (/cves?severity=CRITICAL,HIGH&exploited=1&sort=danger). That means any filtered view can be bookmarked or shared, and the server page simply reads searchParams.",
+    "parseFilters() validates every URL value against an allow-list and drops anything unknown. Search text is stripped to letters, digits, spaces, dots and dashes before it goes into the database query — never trust input from the URL.",
+    "The database does the filtering (.in, .eq, .gte, .ilike, .order, .range), so only 30 rows travel to the page. range() is pagination: page 2 = rows 30–59.",
+    "FilterBar is a client component: clicking a chip builds a new URL and calls router.push inside startTransition, so the old results stay visible (slightly faded) while new ones load.",
+    "Gotcha: in SQL, \"status <> 'Rejected'\" is NOT true when status is NULL. We use or(vuln_status.is.null, vuln_status.neq.Rejected) to keep rows with no status.",
+    "The daily job now also fills in full NVD details for 40 exploited CVEs per day, so they get a severity and appear in the danger filters.",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
