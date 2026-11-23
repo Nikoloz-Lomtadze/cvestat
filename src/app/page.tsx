@@ -69,10 +69,11 @@ export default function Home() {
         <div className="flex-1">
           <p className="label mb-1 text-[10px] text-cyan/80">▼ 1000 m · Midnight zone</p>
           <h2 className="font-pixel text-2xl">Go deeper</h2>
-          <p className="text-sm text-muted">Every new CVE, plus today&apos;s security news in two sentences each.</p>
+          <p className="text-sm text-muted">Filter every CVE by danger level, or read today&apos;s security news in two sentences each.</p>
         </div>
         <div className="flex gap-3">
-          <Link href="/cves" className="px-btn px-4 py-2 text-xs">Latest CVEs</Link>
+          <Link href="/cves?severity=CRITICAL&exploited=1&sort=danger" className="px-btn px-4 py-2 text-xs">Critical &amp; exploited</Link>
+          <Link href="/cves" className="px-btn px-4 py-2 text-xs">Find CVEs</Link>
           <Link href="/news" className="px-btn px-4 py-2 text-xs">News</Link>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "./supabase";
 import { fetchEpss, fetchKev, fetchNvdRecent } from "./sources";
+import { getCve } from "./cves";
 
 async function upsertChunks(rows: Record<string, unknown>[], errors: string[]) {
   for (let i = 0; i < rows.length; i += 500) {
@@ -16,7 +17,7 @@ async function upsertChunks(rows: Record<string, unknown>[], errors: string[]) {
  * 3. EPSS exploit probability for all of the above.
  * No AI here: explanations are generated only when a person opens a CVE page.
  */
-export async function ingestCves(): Promise<{ nvd: number; kev: number; errors: string[] }> {
+export async function ingestCves(): Promise<{ nvd: number; kev: number; backfilled: number; errors: string[] }> {
   const errors: string[] = [];
 
   const recent = await fetchNvdRecent(48).catch((e) => (errors.push(`NVD: ${e}`), []));
@@ -58,5 +59,20 @@ export async function ingestCves(): Promise<{ nvd: number; kev: number; errors: 
     errors,
   );
 
-  return { nvd: recent.length, kev: kev.length, errors };
+  // KEV only gives us a short description. Fill in full NVD details (severity score, products…)
+  // for up to 40 exploited CVEs per day, newest first — gentle on NVD's rate limit.
+  const { data: missing } = await db()
+    .from("cves")
+    .select("id")
+    .eq("in_kev", true)
+    .is("nvd_synced_at", null)
+    .order("kev_date_added", { ascending: false })
+    .limit(40);
+  let backfilled = 0;
+  for (const { id } of missing ?? []) {
+    if (await getCve(id).catch(() => null)) backfilled++;
+    await new Promise((r) => setTimeout(r, 700)); // NVD allows ~50 requests / 30 s with a key
+  }
+
+  return { nvd: recent.length, kev: kev.length, backfilled, errors };
 }

@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
             <div className="ml-auto flex items-center gap-5 text-xs">
               <Link href="/cves" className="label text-muted hover:text-cyan">
-                Latest
+                Find CVEs
               </Link>
               <Link href="/news" className="label text-muted hover:text-cyan">
                 News
