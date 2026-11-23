@@ -89,7 +89,7 @@ export function ExplanationLoader({ id }: { id: string }) {
       body: JSON.stringify({ id }),
     })
       .then(async (r) => {
-        const json = await r.json();
+        const json = await r.json().catch(() => ({ error: "The AI is busy right now. Reload the page in a minute." }));
         if (cancelled) return;
         if (r.ok) setState({ status: "done", e: json.explanation, reviewed: json.reviewed });
         else setState({ status: "error", msg: json.error ?? "Something went wrong." });

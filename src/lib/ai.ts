@@ -31,6 +31,7 @@ export async function generateJson<T extends z.ZodType>(opts: {
   delete jsonSchema.$schema; // Gemini doesn't accept this field
 
   let lastError: unknown;
+  const started = Date.now();
   for (let attempt = 0; attempt < 5; attempt++) {
     const model = MODELS[attempt % MODELS.length];
     try {
@@ -42,11 +43,13 @@ export async function generateJson<T extends z.ZodType>(opts: {
           responseMimeType: "application/json",
           responseJsonSchema: jsonSchema,
           temperature: 0.3,
+          httpOptions: { timeout: 25_000 }, // give up on a slow model after 25 s and try the next
         },
       });
       return opts.schema.parse(JSON.parse(res.text ?? ""));
     } catch (e) {
       lastError = e;
+      if (Date.now() - started > 70_000) break; // stay well inside the server time limit
       if (isBusy(e)) await sleep(1000 * 2 ** attempt);
     }
   }

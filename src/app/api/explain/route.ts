@@ -2,7 +2,7 @@ import { getCve, getExplanation } from "@/lib/cves";
 import { consumeQuota, createExplanation } from "@/lib/explain";
 import { normalizeCveId } from "@/lib/types";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const DAILY_LIMIT = Number(process.env.EXPLAIN_DAILY_LIMIT ?? 300);
 
