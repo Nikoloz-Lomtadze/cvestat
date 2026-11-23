@@ -122,6 +122,33 @@ module.exports = [
     "Next.js 16 changed APIs (params is now a Promise, middleware is renamed proxy). Lesson: the AGENTS.md file in the project says to read the docs bundled in node_modules/next/dist/docs before writing code — the framework changes faster than tutorials.",
   ]},
 
+
+  { t: "h2", text: "9. Going live: three real-world bugs" },
+  { t: "bullets", items: [
+    "\"Missing Supabase env vars\" — the keys in Vercel had different names than the code expected. Fix: the code now accepts both names (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL). Lesson: env var names are part of the contract between code and hosting.",
+    "\"permission denied for table cves\" — RLS policies decide WHICH rows a role may see, but GRANTs decide whether a role may touch the table at all. Newer Supabase projects don't grant automatically, so we added supabase/migrations/0002_grants.sql.",
+    "Gemini \"503 high demand\" — free models get overloaded. Fix: retry with exponential backoff (wait 1s, 2s, 4s, 8s) and rotate between three free models. News saved without a summary is repaired on the next run (\"self-healing\").",
+    "PowerShell got \"308 Permanent Redirect\" — cvestat.com redirects to www.cvestat.com, and the request with a secret header doesn't follow redirects. Use the final URL.",
+  ]},
+
+  { t: "h1", text: "Session 2 — 23 Nov 2026: the \"deep dive\" design" },
+  { t: "p", text: "Inspired by the retro diving game Krillion: the homepage starts at the surface (pixel sky, sun, clouds) and the site is an ocean you dive into. All pixel art is our own." },
+  { t: "bullets", items: [
+    "Sprites as text grids (src/components/ocean/sprites.ts). Each character is one pixel, \".\" is transparent, letters map to colors. The Sprite component turns the grid into SVG <rect>s with shapeRendering=\"crispEdges\" so pixels stay sharp at any size.",
+    "Animation is pure CSS (@keyframes in globals.css): fish swim across with translateX, bob up and down, seaweed sways with skewX from its bottom edge, bubbles rise, trash drifts. Trash uses a long cycle where it's visible only for the first 40% — so it appears \"sometimes\".",
+    "Depth: Ocean.tsx listens to scrolling and sets a CSS variable --depth from 0 to 1. The CSS uses it to darken the water and fade the light rays, and the depth gauge shows meters. One JS number drives several visual effects.",
+    "Readability first: the ocean is a fixed layer behind everything (pointer-events: none, aria-hidden). Content sits on solid \"pixel panels\". Seaweed is hidden on phones where it would cover text. Users with \"reduce motion\" turned on get a still ocean (prefers-reduced-motion).",
+    "Fonts are installed as npm packages (@fontsource/pixelify-sans, @fontsource/silkscreen, geist), so builds never depend on downloading fonts.",
+    "CSS layers: our custom classes (.px-panel, .px-btn) live in @layer components, so Tailwind utility classes can still override them.",
+  ]},
+  { t: "code", text: [
+    "// one fish, 7 rows × 12 columns. X = body, T = tail, E = eye",
+    "\".....XXX....\",",
+    "\"T..XXXXXXX..\",",
+    "\"TTXXXXXXXXX.\",",
+    "\"TTXXXXXXXEXX\",",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
@@ -135,5 +162,9 @@ module.exports = [
     ["Race condition", "A bug when two things happen at the same time and step on each other."],
     ["Cron", "A schedule that runs a job automatically (here: daily)."],
     ["Structured output", "Forcing an AI to answer in an exact JSON shape."],
+    ["GRANT", "Permission for a database role to use a table at all (RLS then filters rows)."],
+    ["Exponential backoff", "Retrying after waiting longer each time: 1s, 2s, 4s…"],
+    ["CSS variable", "A value like --depth that many styles can read; change it once, everything updates."],
+    ["Sprite", "A small image used for a game-like object, here drawn from a text grid."],
   ]},
 ];
