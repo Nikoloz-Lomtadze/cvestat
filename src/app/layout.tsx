@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { AnglerLogo } from "@/components/AnglerLogo";
 import { AuthButton } from "@/components/auth";
 import { Links, NavLinks } from "@/components/NavLinks";
@@ -10,7 +11,9 @@ import { Ocean } from "@/components/ocean/Ocean";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cvestat.com"),
+  metadataBase: new URL("https://www.cvestat.com"), // www is the main domain (no redirect for link previews)
+  openGraph: { type: "website", siteName: "CVEStat", locale: "en_US" },
+  twitter: { card: "summary_large_image" },
   title: { default: "CVEStat — CVEs explained simply", template: "%s · CVEStat" },
   description:
     "Learn new and famous CVEs in plain English: simple explanations, real-world examples, and an AI tutor for every vulnerability.",
@@ -49,6 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
           </p>
         </footer>
+        <Analytics />
       </body>
     </html>
   );

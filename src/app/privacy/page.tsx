@@ -25,7 +25,8 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="If you just browse">
-        <p>You can read every CVE and news page without an account. We don&apos;t use ads, analytics trackers or tracking cookies.</p>
+        <p>You can read every CVE and news page without an account. We don&apos;t use ads or tracking cookies.</p>
+        <p>We use Vercel Web Analytics to count page views. It uses no cookies and doesn&apos;t identify you — we only see totals like the number of visitors, pages viewed, countries and browsers.</p>
         <p>To keep the free AI within its limits, we count how many new explanations each IP address triggers per day. These counters are deleted after 7 days. Our hosting provider (Vercel) keeps standard server logs.</p>
       </Section>
 
