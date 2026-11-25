@@ -92,8 +92,9 @@ export function CveChat({ id }: { id: string }) {
       ) : (
         <>
           <p className="mb-4 text-xs text-muted">
-            ⚠ Don&apos;t share personal or confidential information. Answers are AI-generated and may be wrong. Chats
-            aren&apos;t saved.
+            ⚠ Don&apos;t share personal or confidential information — questions are processed by Google Gemini.
+            Answers are AI-generated and may be wrong. We don&apos;t save your chats.{" "}
+            <a href="/privacy" className="underline hover:text-cyan">Privacy</a>
           </p>
 
           {msgs.length === 0 && (

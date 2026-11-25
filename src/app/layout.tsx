@@ -42,6 +42,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             each page. This product uses data from the NVD API but is not endorsed or certified by the NVD. Exploit
             data from CISA KEV and FIRST EPSS.
           </p>
+          <p className="mt-2">
+            <Link href="/privacy" className="underline hover:text-cyan">
+              Privacy policy
+            </Link>
+          </p>
         </footer>
       </body>
     </html>

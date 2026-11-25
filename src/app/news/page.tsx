@@ -42,7 +42,7 @@ async function NewsList() {
             <span className="label text-[10px] text-cyan">{n.source}</span>
             {n.published_at && <time>{new Date(n.published_at).toUTCString().slice(0, 16)}</time>}
           </div>
-          <a href={n.url} target="_blank" rel="noreferrer" className="font-medium hover:text-cyan hover:underline">
+          <a href={/^https?:\/\//i.test(n.url) ? n.url : "#"} target="_blank" rel="noreferrer" className="font-medium hover:text-cyan hover:underline">
             {n.title}
           </a>
           {n.summary && <p className="mt-1 text-sm text-muted">{n.summary}</p>}

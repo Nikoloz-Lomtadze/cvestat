@@ -13,6 +13,13 @@ export async function getCve(id: string): Promise<Cve | null> {
   const { data: existing } = await db().from("cves").select("*").eq("id", id).maybeSingle<Cve>();
   if (existing?.nvd_synced_at) return existing;
 
+  // Cap on-demand NVD lookups so bots opening thousands of random CVE pages can't fill our free database.
+  const { data: allowed } = await db().rpc("consume_quota", {
+    p_key: "nvd:ondemand",
+    p_limit: Number(process.env.NVD_ONDEMAND_DAILY_LIMIT ?? 3000),
+  });
+  if (allowed !== true) return existing ?? null;
+
   let fromNvd: Partial<Cve> | null = null;
   try {
     fromNvd = await fetchNvdCve(id);

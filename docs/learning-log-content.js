@@ -172,6 +172,16 @@ module.exports = [
     "Input validation with zod: max 40 messages, each max 4000 chars, the new question max 1000 — so nobody can send a giant prompt that burns the free quota.",
   ]},
 
+  { t: "h2", text: "Security review (25 Nov 2026)" },
+  { t: "bullets", items: [
+    "\"Fail closed\": the cron job compared the header with `Bearer ${CRON_SECRET}`. If the env var were missing, the expected value would be \"Bearer undefined\" — which anyone could send. Now a missing or short secret rejects everyone.",
+    "Per-visitor limits: one person could have used up the whole day's 300 AI explanations. Now each IP may trigger 30 per day (x-real-ip, set by Vercel). On-demand NVD lookups are capped at 3000/day so bots can't fill the 500 MB free database.",
+    "Only http(s) links are rendered from NVD/RSS data — a javascript: URL in a link would be an XSS hole.",
+    "Security headers (next.config.ts): HSTS forces HTTPS, X-Frame-Options/frame-ancestors block clickjacking, nosniff stops MIME tricks.",
+    "Old usage counters are deleted after 7 days (data minimisation, GDPR).",
+    "Privacy page added: required for Google login and for EU users.",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
@@ -192,6 +202,8 @@ module.exports = [
     ["OAuth", "Logging in through another service (Google, GitHub) without giving us your password."],
     ["Access token", "A short-lived signed string that proves who the logged-in user is."],
     ["Prompt injection", "Text that tries to trick an AI into ignoring its rules."],
+    ["Fail closed", "When something is misconfigured, deny access instead of allowing it."],
+    ["Clickjacking", "Hiding a real site inside an invisible frame to trick clicks."],
     ["Open redirect", "A bug where a link on a trusted site forwards users to any site the attacker picks."],
   ]},
 ];

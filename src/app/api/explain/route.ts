@@ -5,6 +5,12 @@ import { normalizeCveId } from "@/lib/types";
 export const maxDuration = 120;
 
 const DAILY_LIMIT = Number(process.env.EXPLAIN_DAILY_LIMIT ?? 300);
+const PER_IP_LIMIT = Number(process.env.EXPLAIN_IP_DAILY_LIMIT ?? 30);
+
+/** Visitor IP as reported by Vercel (x-real-ip can't be faked by the visitor there). */
+function clientIp(req: Request) {
+  return req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+}
 
 // If two people open the same new CVE at once, generate only once (per server instance).
 const inFlight = new Map<string, Promise<unknown>>();
@@ -30,6 +36,9 @@ export async function POST(req: Request) {
   try {
     let job = inFlight.get(id);
     if (!job) {
+      // One visitor can't use up the whole site's daily AI budget.
+      if (!(await consumeQuota(`explain:ip:${clientIp(req)}`, PER_IP_LIMIT)))
+        return Response.json({ error: "You've opened a lot of new CVEs today. Try again tomorrow." }, { status: 429 });
       if (!(await consumeQuota("explain:global", DAILY_LIMIT)))
         return Response.json(
           { error: "Daily AI limit reached. Explanations for new CVEs resume tomorrow." },

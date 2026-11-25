@@ -103,7 +103,7 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
                 NVD record
               </a>
             </li>
-            {cve.refs.slice(0, 8).map((r) => (
+            {cve.refs.filter((r) => /^https?:\/\//i.test(r.url)).slice(0, 8).map((r) => (
               <li key={r.url}>
                 <a className="text-muted hover:text-foreground hover:underline" href={r.url} target="_blank" rel="noreferrer nofollow">
                   {hostname(r.url)}
