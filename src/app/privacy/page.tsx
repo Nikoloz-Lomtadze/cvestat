@@ -36,6 +36,7 @@ export default function PrivacyPage() {
 
       <Section title="The AI tutor">
         <p>Your questions and the CVE details are sent to Google&apos;s Gemini API to generate answers. We don&apos;t store your conversations — they stay in your browser tab and disappear when you close it. Google processes this data under its own terms and may use it to improve its services, so please don&apos;t share personal or confidential information.</p>
+        <p>The AI tutor is currently not offered to visitors in the EU/EEA, the UK or Switzerland.</p>
       </Section>
 
       <Section title="Your rights">

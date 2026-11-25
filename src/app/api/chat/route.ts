@@ -2,6 +2,7 @@ import { z } from "zod";
 import { generateChat } from "@/lib/ai";
 import { getCve, getExplanation } from "@/lib/cves";
 import { consumeQuota } from "@/lib/explain";
+import { chatAllowed, REGION_MESSAGE } from "@/lib/region";
 import { db } from "@/lib/supabase";
 import { normalizeCveId } from "@/lib/types";
 
@@ -33,7 +34,13 @@ Rules:
  * Requires login. Each user gets a small daily number of questions to keep us in the free AI tier.
  * Conversations are NOT stored — they only live in the user's browser tab.
  */
+/** GET /api/chat → is the tutor available for this visitor's region? */
+export function GET(req: Request) {
+  return Response.json({ available: chatAllowed(req) }, { headers: { "Cache-Control": "private, no-store" } });
+}
+
 export async function POST(req: Request) {
+  if (!chatAllowed(req)) return Response.json({ error: REGION_MESSAGE }, { status: 451 });
   const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return Response.json({ error: "Please log in to use the AI tutor." }, { status: 401 });
   const { data: auth } = await db().auth.getUser(token);

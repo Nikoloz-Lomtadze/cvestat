@@ -30,6 +30,15 @@ export function CveChat({ id }: { id: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const end = useRef<HTMLDivElement>(null);
+  const [available, setAvailable] = useState<boolean | null>(null);
+
+  // Ask the server whether the tutor is offered in this visitor's region.
+  useEffect(() => {
+    fetch("/api/chat")
+      .then((r) => r.json())
+      .then((j) => setAvailable(j.available !== false))
+      .catch(() => setAvailable(true));
+  }, []);
 
   useEffect(() => {
     try {
@@ -82,8 +91,13 @@ export function CveChat({ id }: { id: string }) {
         )}
       </div>
 
-      {!ready ? (
+      {!ready || available === null ? (
         <div className="h-20 animate-pulse" />
+      ) : !available ? (
+        <p className="text-sm text-muted">
+          The AI tutor isn&apos;t available in the EU, UK or Switzerland yet. Everything else on CVEStat — including the
+          explanation above — works as usual.
+        </p>
       ) : !user ? (
         <div className="space-y-3 text-sm">
           <p className="text-muted">

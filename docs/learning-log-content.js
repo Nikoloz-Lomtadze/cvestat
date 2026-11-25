@@ -194,6 +194,13 @@ module.exports = [
     "Bug found while testing: a missing Supabase key crashed every page (the login button threw). Now login just hides itself — one broken feature shouldn't take down the site.",
   ]},
 
+  { t: "h2", text: "Region rule for the AI tutor" },
+  { t: "bullets", items: [
+    "Gemini's free tier may not be offered to users in the EEA, Switzerland or the UK. Vercel adds the visitor's country to every request (x-vercel-ip-country), so /api/chat refuses those countries with HTTP 451 (\"Unavailable For Legal Reasons\") and the chat box shows a friendly message instead.",
+    "The check is on the server, not just in the UI — hiding a button in the browser alone is never a security control.",
+    "Everything else (CVE pages, explanations, news, radar) stays available everywhere.",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
