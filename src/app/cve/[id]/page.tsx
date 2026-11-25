@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { ExploitedBadge, SeverityBadge } from "@/components/CveCard";
+import { CveChat } from "@/components/CveChat";
 import { ExplanationBody, ExplanationLoader } from "@/components/ExplanationView";
 import { getCve, getExplanation } from "@/lib/cves";
 import { ExplanationSchema } from "@/lib/explain";
@@ -57,6 +58,8 @@ async function CveContent({ params }: { params: Promise<{ id: string }> }) {
         ) : (
           <ExplanationLoader id={cve.id} />
         )}
+
+        {!rejected && <CveChat id={cve.id} />}
 
         <section className="px-panel p-5">
           <h2 className="label mb-3 text-[11px] text-muted">Official description (NVD)</h2>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Link from "next/link";
+import { AuthButton } from "@/components/auth";
 import { Ocean } from "@/components/ocean/Ocean";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/news" className="label text-muted hover:text-cyan">
                 News
               </Link>
+              <AuthButton />
             </div>
           </nav>
         </header>

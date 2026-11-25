@@ -55,3 +55,38 @@ export async function generateJson<T extends z.ZodType>(opts: {
   }
   throw lastError;
 }
+
+export type ChatTurn = { role: "user" | "model"; text: string };
+
+/**
+ * Plain-text chat answer from Gemini, with the same model fallback as generateJson.
+ * `history` is the whole conversation so far, ending with the user's new question.
+ */
+export async function generateChat(opts: { system: string; history: ChatTurn[] }): Promise<string> {
+  const contents = opts.history.map((t) => ({ role: t.role, parts: [{ text: t.text }] }));
+  let lastError: unknown;
+  const started = Date.now();
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const model = MODELS[attempt % MODELS.length];
+    try {
+      const res = await gemini().models.generateContent({
+        model,
+        contents,
+        config: {
+          systemInstruction: opts.system,
+          temperature: 0.4,
+          maxOutputTokens: 700,
+          httpOptions: { timeout: 20_000 },
+        },
+      });
+      const text = res.text?.trim();
+      if (text) return text;
+      throw new Error("empty answer");
+    } catch (e) {
+      lastError = e;
+      if (Date.now() - started > 45_000) break;
+      if (isBusy(e)) await sleep(1000 * 2 ** attempt);
+    }
+  }
+  throw lastError;
+}

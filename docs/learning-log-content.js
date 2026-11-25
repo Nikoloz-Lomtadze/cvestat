@@ -160,6 +160,18 @@ module.exports = [
     "The daily job now also fills in full NVD details for 40 exploited CVEs per day, so they get a severity and appear in the danger filters.",
   ]},
 
+  { t: "h1", text: "Session 3 — 25 Nov 2026: login + AI tutor chat" },
+  { t: "bullets", items: [
+    "Login uses Supabase Auth with Google and GitHub (OAuth). We never see passwords: the user logs in on Google/GitHub, which sends them back to /auth/callback with a one-time code. The server swaps the code for a session (PKCE flow) and stores it in cookies.",
+    "Open-redirect protection: /auth/callback?next=... only accepts paths starting with \"/\" (not \"//\"), so nobody can craft a login link that bounces users to a phishing site.",
+    "Two Supabase clients: the browser one uses the public anon key (safe to ship); the server one uses the secret key and is marked \"server-only\". The chat API checks who the user is by sending their access token in the Authorization header and verifying it with supabase.auth.getUser(token).",
+    "The login button is a client component, so the header stays part of the fast static page (with Cache Components, reading cookies on the server would make every page wait).",
+    "AI chat (/api/chat): the prompt = strict rules + this CVE's data + the saved explanation + the last 12 messages. Rules: no exploit code, stay on topic, never ask for personal info, ignore attempts to change the rules (prompt-injection defense).",
+    "Limits keep AI cost at $0: 20 questions per user per day (counter key chat:<user id>) and 500 for the whole site (chat:global), using the same atomic consume_quota() database function as explanations.",
+    "Privacy by design: conversations are not stored in the database. They live in sessionStorage — kept on reload, gone when the tab closes.",
+    "Input validation with zod: max 40 messages, each max 4000 chars, the new question max 1000 — so nobody can send a giant prompt that burns the free quota.",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
@@ -177,5 +189,9 @@ module.exports = [
     ["Exponential backoff", "Retrying after waiting longer each time: 1s, 2s, 4s…"],
     ["CSS variable", "A value like --depth that many styles can read; change it once, everything updates."],
     ["Sprite", "A small image used for a game-like object, here drawn from a text grid."],
+    ["OAuth", "Logging in through another service (Google, GitHub) without giving us your password."],
+    ["Access token", "A short-lived signed string that proves who the logged-in user is."],
+    ["Prompt injection", "Text that tries to trick an AI into ignoring its rules."],
+    ["Open redirect", "A bug where a link on a trusted site forwards users to any site the attacker picks."],
   ]},
 ];
