@@ -24,8 +24,8 @@ Official CVE descriptions are written for experts — one dense sentence full of
 | Homepage | CVE page |
 |---|---|
 | ![Homepage](docs/screenshots/home.jpg) | ![CVE page](docs/screenshots/cve-page.jpg) |
-| **Explanation + AI tutor** | **Threat Radar** |
-| ![Explanation and AI tutor](docs/screenshots/explanation-tutor.jpg) | ![Threat Radar](docs/screenshots/radar.jpg) |
+| **AI tutor** | **Threat Radar** |
+| ![AI tutor answering a question](docs/screenshots/ai-tutor.png) | ![Threat Radar](docs/screenshots/radar.jpg) |
 | **Find CVEs** | |
 | ![Find CVEs](docs/screenshots/find-cves.jpg) | |
 
