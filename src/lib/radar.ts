@@ -23,7 +23,7 @@ async function cf<T>(path: string, params: Record<string, string>): Promise<T> {
   if (!token) throw new Error("Missing CLOUDFLARE_RADAR_TOKEN");
   const res = await fetch(`${API}${path}?${new URLSearchParams({ dateRange: "1d", format: "json", ...params })}`, {
     headers: { Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(25_000), // Radar can be slow on big queries
   });
   if (!res.ok) throw new Error(`Cloudflare Radar ${path}: ${res.status}`);
   const json = (await res.json()) as { success: boolean; result: T };
@@ -45,38 +45,45 @@ const fromSummary = (s: Record<string, string>, n: number): Ranked[] =>
 /** Last 24 hours of attack data. Cached on the server and refreshed every 15 minutes. */
 export async function getRadar(): Promise<RadarData | null> {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
-  try {
-    const [pairs, origins, targets, industries, types] = await Promise.all([
-      // limitPerLocation keeps one huge source country from taking every line on the map
-      cf<Top<{ originCountryAlpha2: string; originCountryName: string; targetCountryAlpha2: string; targetCountryName: string; value: string }>>(
-        "/top/attacks",
-        { limit: "40", limitDirection: "ORIGIN", limitPerLocation: "4" },
-      ),
-      cf<Top<{ originCountryAlpha2: string; originCountryName: string; value: string }>>("/top/locations/origin", { limit: "10" }),
-      cf<Top<{ targetCountryAlpha2: string; targetCountryName: string; value: string }>>("/top/locations/target", { limit: "10" }),
-      cf<Summary>("/summary/INDUSTRY", {}),
-      cf<Summary>("/summary/MITIGATION_PRODUCT", {}),
-    ]);
-    return {
-      pairs: pairs.top_0.map((p) => ({
-        from: p.originCountryAlpha2,
-        fromName: p.originCountryName,
-        to: p.targetCountryAlpha2,
-        toName: p.targetCountryName,
-        share: pct(p.value),
-      })),
-      origins: origins.top_0.map((o) => ({ code: o.originCountryAlpha2, name: o.originCountryName, share: pct(o.value) })),
-      targets: targets.top_0.map((t) => ({ code: t.targetCountryAlpha2, name: t.targetCountryName, share: pct(t.value) })),
-      industries: fromSummary(industries.summary_0, 8),
-      types: fromSummary(types.summary_0, 6),
-      updatedAt: new Date().toISOString(),
-    };
-  } catch (e) {
-    console.error("radar fetch failed", e);
+  // Each request on its own, so one slow endpoint doesn't take down the whole page.
+  const [pairs, origins, targets, industries, types] = await Promise.allSettled([
+    // limitPerLocation keeps one huge source country from taking every line on the map
+    cf<Top<{ originCountryAlpha2: string; originCountryName: string; targetCountryAlpha2: string; targetCountryName: string; value: string }>>(
+      "/top/attacks",
+      { limit: "40", limitDirection: "ORIGIN", limitPerLocation: "4" },
+    ),
+    cf<Top<{ originCountryAlpha2: string; originCountryName: string; value: string }>>("/top/locations/origin", { limit: "10" }),
+    cf<Top<{ targetCountryAlpha2: string; targetCountryName: string; value: string }>>("/top/locations/target", { limit: "10" }),
+    cf<Summary>("/summary/INDUSTRY", {}),
+    cf<Summary>("/summary/MITIGATION_PRODUCT", {}),
+  ]);
+  const failed = [pairs, origins, targets, industries, types].filter((r) => r.status === "rejected");
+  failed.forEach((r) => console.error("radar fetch failed:", (r as PromiseRejectedResult).reason));
+
+  // Without the routes there's no map. Don't keep a failure for long — try again in a minute.
+  if (pairs.status === "rejected") {
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
     return null;
   }
+  // Partial data: show it, but retry sooner than usual.
+  cacheLife(failed.length ? { stale: 30, revalidate: 120, expire: 3600 } : { stale: 300, revalidate: 900, expire: 86400 });
+
+  const ok = <T,>(r: PromiseSettledResult<T>) => (r.status === "fulfilled" ? r.value : null);
+  return {
+    pairs: pairs.value.top_0.map((p) => ({
+      from: p.originCountryAlpha2,
+      fromName: p.originCountryName,
+      to: p.targetCountryAlpha2,
+      toName: p.targetCountryName,
+      share: pct(p.value),
+    })),
+    origins: (ok(origins)?.top_0 ?? []).map((o) => ({ code: o.originCountryAlpha2, name: o.originCountryName, share: pct(o.value) })),
+    targets: (ok(targets)?.top_0 ?? []).map((t) => ({ code: t.targetCountryAlpha2, name: t.targetCountryName, share: pct(t.value) })),
+    industries: fromSummary(ok(industries)?.summary_0 ?? {}, 8),
+    types: fromSummary(ok(types)?.summary_0 ?? {}, 6),
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 const NAMES: Record<string, string> = {
