@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Privacy policy" };
 
-const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+const CONTACT = "nikoloz.lomtadze.10@gmail.com";
 const UPDATED = "25 November 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
