@@ -57,13 +57,13 @@ export function AuthButton() {
   }, [open]);
 
   if (!supabaseBrowser()) return null;
-  if (!ready) return <span className="label w-16 text-muted opacity-0">…</span>;
+  if (!ready) return <span className="nav-btn label opacity-0">Log in</span>;
 
   const name = user?.user_metadata?.full_name || user?.user_metadata?.user_name || user?.email?.split("@")[0];
 
   return (
     <div ref={box} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="label max-w-36 truncate text-cyan hover:text-pink">
+      <button onClick={() => setOpen((o) => !o)} className="nav-btn nav-btn-login label max-w-40 truncate">
         {user ? `◉ ${name}` : "Log in"}
       </button>
       {open && (

@@ -152,6 +152,41 @@ body {
   border-color: var(--pink);
   box-shadow: 0 0 0 2px #0b1a33, 0 0 14px rgb(255 92 138 / 0.45);
 }
+/* header links */
+.nav-btn {
+  color: var(--foreground);
+  padding: 0.35rem 0.55rem;
+  border: 2px solid transparent;
+  text-shadow: 0 0 8px rgb(79 216 255 / 0.35);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.nav-btn:hover {
+  color: var(--cyan);
+  border-color: rgb(79 216 255 / 0.5);
+}
+.nav-btn-active {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgb(79 216 255 / 0.1);
+  box-shadow: 2px 2px 0 0 rgb(0 0 0 / 0.45);
+}
+.nav-btn-login {
+  color: #0b1a33;
+  background: var(--cyan);
+  border-color: var(--cyan);
+  text-shadow: none;
+  box-shadow: 2px 2px 0 0 rgb(0 0 0 / 0.45);
+  margin-left: 0.25rem;
+}
+.nav-btn-login:hover {
+  color: #0b1a33;
+  background: var(--pink);
+  border-color: var(--pink);
+}
+@media (max-width: 639px) {
+  .nav-btn { padding: 0.3rem 0.3rem; letter-spacing: 0.08em; }
+  .nav-btn-login { margin-left: 0.15rem; }
+}
 /* retro "glitch" title: pink + cyan offset */
 .chroma {
   text-shadow: -3px 0 var(--pink), 3px 0 var(--cyan);

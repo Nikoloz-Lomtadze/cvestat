@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AuthButton } from "@/components/auth";
+import { Links, NavLinks } from "@/components/NavLinks";
 import { Ocean } from "@/components/ocean/Ocean";
 import "./globals.css";
 
@@ -18,21 +20,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <Ocean />
-        <header className="sticky top-0 z-30 border-b-2 border-border bg-[#071a33]/90 backdrop-blur">
-          <nav className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:gap-6">
-            <Link href="/" className="chroma font-pixel text-xl font-bold tracking-wider sm:text-2xl">
+        <header className="sticky top-0 z-30 border-b-2 border-border bg-[#061428]/95 backdrop-blur">
+          <nav className="mx-auto flex max-w-5xl items-center gap-2 px-3 py-3 sm:gap-6 sm:px-4">
+            <Link href="/" className="chroma font-pixel text-lg font-bold tracking-wider sm:text-2xl">
               CVESTAT
             </Link>
-            <div className="ml-auto flex items-center gap-3 whitespace-nowrap text-[10px] sm:gap-5 sm:text-xs">
-              <Link href="/cves" className="label text-muted hover:text-cyan">
-                Find CVEs
-              </Link>
-              <Link href="/news" className="label text-muted hover:text-cyan">
-                News
-              </Link>
-              <Link href="/radar" className="label text-muted hover:text-cyan">
-                Radar
-              </Link>
+            <div className="ml-auto flex items-center gap-1 whitespace-nowrap text-[10px] sm:gap-2 sm:text-[13px]">
+              <Suspense fallback={<Links />}>
+                <NavLinks />
+              </Suspense>
               <AuthButton />
             </div>
           </nav>
