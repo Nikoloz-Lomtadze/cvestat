@@ -166,6 +166,9 @@ body {
 
 
 /* ---------- Threat Radar map ---------- */
+.flag-emoji {
+  font-family: "Twemoji Country Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
 .radar-comet {
   stroke-dasharray: 10 90;
   stroke-dashoffset: 100;

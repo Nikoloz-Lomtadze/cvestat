@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AttackMap } from "@/components/radar/AttackMap";
-import { flag } from "@/lib/flag";
+import { Flag, FlagPolyfill } from "@/components/Flag";
 import { getRadar, type Ranked } from "@/lib/radar";
 
 export const metadata: Metadata = {
@@ -13,6 +13,7 @@ export default async function RadarPage() {
 
   return (
     <div className="space-y-6">
+      <FlagPolyfill />
       <header>
         <p className="label mb-2 text-[11px] text-cyan">◎ Threat Radar</p>
         <h1 className="chroma font-pixel text-4xl font-bold tracking-wide sm:text-5xl">Live attack map</h1>
@@ -62,7 +63,7 @@ export default async function RadarPage() {
             <a href="https://radar.cloudflare.com/security/application-layer" target="_blank" rel="noreferrer" className="text-cyan underline">
               Cloudflare Radar
             </a>{" "}
-            (CC BY-NC 4.0), last 24 hours. Map: Natural Earth. Fetched{" "}
+            (CC BY-NC 4.0), last 24 hours. Map: Natural Earth. Flags: Twemoji (CC BY 4.0). Fetched{" "}
             {new Date(data.updatedAt).toISOString().slice(11, 16)} UTC.
           </p>
         </>
@@ -84,7 +85,7 @@ function Bars({ title, items, color, withFlag }: { title: string; items: Ranked[
             <li key={i.code}>
               <div className="mb-0.5 flex justify-between gap-2">
                 <span className="truncate">
-                  {withFlag && `${flag(i.code)} `}
+                  {withFlag && <><Flag code={i.code} /> </>}
                   {i.name}
                 </span>
                 <span className="font-mono text-muted">{i.share}%</span>

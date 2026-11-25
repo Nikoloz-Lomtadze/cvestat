@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { flag } from "@/lib/flag";
+import { Flag } from "@/components/Flag";
 import type { AttackPair } from "@/lib/radar";
 import { LAND, MAP_H, MAP_W, POINTS } from "./world";
 
@@ -105,7 +105,7 @@ export function AttackMap({ pairs }: { pairs: AttackPair[] }) {
         {shown && (
           <div className="pointer-events-none absolute right-3 top-3 border-2 border-pink bg-[#0b1a33] px-3 py-2 text-xs">
             <p className="font-medium">
-              {flag(shown.from)} {shown.fromName} → {flag(shown.to)} {shown.toName}
+              <Flag code={shown.from} /> {shown.fromName} → <Flag code={shown.to} /> {shown.toName}
             </p>
             <p className="text-muted">{shown.share}% of all attacks in 24h</p>
           </div>
@@ -123,7 +123,7 @@ export function AttackMap({ pairs }: { pairs: AttackPair[] }) {
               className={`flex cursor-default items-center justify-between gap-2 border-l-2 px-2 py-1 ${active === i ? "border-pink bg-[#0b1a33]" : "border-transparent"}`}
             >
               <span className="truncate">
-                {flag(p.from)} {p.from} → {flag(p.to)} {p.to}
+                <Flag code={p.from} /> {p.from} → <Flag code={p.to} /> {p.to}
               </span>
               <span className="font-mono text-muted">{p.share}%</span>
             </li>
