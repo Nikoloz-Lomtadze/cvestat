@@ -164,8 +164,33 @@ body {
 
 }
 
+
+/* ---------- Threat Radar map ---------- */
+.radar-comet {
+  stroke-dasharray: 10 90;
+  stroke-dashoffset: 100;
+  animation: radar-comet 3s linear infinite;
+}
+@keyframes radar-comet {
+  0%   { stroke-dashoffset: 100; opacity: 0; }
+  10%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.radar-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: radar-ping 2.5s ease-out infinite;
+}
+@keyframes radar-ping {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
 /* Calm mode for people who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   .swim, .bob, .trash, .tumble, .bubble, .sway, .ray, .cloud { animation: none !important; }
   .bubble, .trash { display: none; }
+  .radar-comet { animation: none !important; stroke-dasharray: none; opacity: 0.8; }
+  .radar-ping { animation: none !important; opacity: 0.5; }
 }

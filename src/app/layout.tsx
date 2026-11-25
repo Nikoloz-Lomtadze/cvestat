@@ -19,16 +19,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <Ocean />
         <header className="sticky top-0 z-30 border-b-2 border-border bg-[#071a33]/90 backdrop-blur">
-          <nav className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3">
-            <Link href="/" className="chroma font-pixel text-2xl font-bold tracking-wider">
+          <nav className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:gap-6">
+            <Link href="/" className="chroma font-pixel text-xl font-bold tracking-wider sm:text-2xl">
               CVESTAT
             </Link>
-            <div className="ml-auto flex items-center gap-5 text-xs">
+            <div className="ml-auto flex items-center gap-3 whitespace-nowrap text-[10px] sm:gap-5 sm:text-xs">
               <Link href="/cves" className="label text-muted hover:text-cyan">
                 Find CVEs
               </Link>
               <Link href="/news" className="label text-muted hover:text-cyan">
                 News
+              </Link>
+              <Link href="/radar" className="label text-muted hover:text-cyan">
+                Radar
               </Link>
               <AuthButton />
             </div>
@@ -40,7 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <p className="mx-auto max-w-3xl">
             Explanations are AI-generated and may contain mistakes — always check the official sources linked on
             each page. This product uses data from the NVD API but is not endorsed or certified by the NVD. Exploit
-            data from CISA KEV and FIRST EPSS.
+            data from CISA KEV and FIRST EPSS. Attack data from Cloudflare Radar (CC BY-NC 4.0).
           </p>
           <p className="mt-2">
             <Link href="/privacy" className="underline hover:text-cyan">

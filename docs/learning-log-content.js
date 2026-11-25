@@ -182,6 +182,18 @@ module.exports = [
     "Privacy page added: required for Google login and for EU users.",
   ]},
 
+  { t: "h1", text: "Session 4 — 25 Nov 2026: Threat Radar (live attack map)" },
+  { t: "bullets", items: [
+    "Honesty first: famous \"live attack maps\" often animate sensor data for show. We only draw real data: Cloudflare Radar's top origin → target country pairs for application-layer attacks over the last 24 hours. Free API, CC BY-NC 4.0 licence (OK for a non-commercial portfolio, attribution required).",
+    "What the data means: origin = country of the attacking IP (often botnets/proxies, not the real attacker); target = billing country of the attacked website. Values are shares (%) of all blocked attacks.",
+    "Caching with Cache Components: getRadar() starts with \"use cache\" and cacheLife({ revalidate: 900 }), so Cloudflare is asked at most every 15 minutes no matter how many people open the page.",
+    "Pixel world map generated once by scripts/build-world-map.mjs: for every cell of a 180×76 grid we ask d3-geo \"is this point on land?\" (Natural Earth data) and save the result as text rows of \"#\" and \".\". The browser draws all ~4,000 dots as ONE SVG path — much faster than 4,000 elements.",
+    "Country positions: the centre of each country's biggest piece (so France isn't placed between Paris and French Guiana).",
+    "Animation is pure CSS: each route is an SVG curve; pathLength=100 + stroke-dasharray \"10 90\" makes a short dash, and animating stroke-dashoffset 100 → 0 moves it along the line. Users with reduced motion get static lines.",
+    "Testing without the real API: the base URL can be overridden (RADAR_API_BASE) to point at a tiny fake Node server with sample data.",
+    "Bug found while testing: a missing Supabase key crashed every page (the login button threw). Now login just hides itself — one broken feature shouldn't take down the site.",
+  ]},
+
   { t: "h2", text: "Glossary" },
   { t: "table", head: ["Term", "Meaning"], rows: [
     ["CVE", "A public ID for one vulnerability, e.g. CVE-2021-44228."],
@@ -202,6 +214,8 @@ module.exports = [
     ["OAuth", "Logging in through another service (Google, GitHub) without giving us your password."],
     ["Access token", "A short-lived signed string that proves who the logged-in user is."],
     ["Prompt injection", "Text that tries to trick an AI into ignoring its rules."],
+    ["Layer 7 attack", "An attack using normal-looking web requests (HTTP), e.g. floods, SQL injection attempts, bad bots."],
+    ["Botnet", "Many hacked devices controlled together, often used for DDoS."],
     ["Fail closed", "When something is misconfigured, deny access instead of allowing it."],
     ["Clickjacking", "Hiding a real site inside an invisible frame to trick clicks."],
     ["Open redirect", "A bug where a link on a trusted site forwards users to any site the attacker picks."],

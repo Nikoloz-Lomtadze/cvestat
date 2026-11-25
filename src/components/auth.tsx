@@ -7,9 +7,11 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 /** The logged-in user (or null), kept up to date when they log in/out in any tab. */
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
+  // Not configured → nothing to wait for.
+  const [ready, setReady] = useState(() => !supabaseBrowser());
   useEffect(() => {
     const sb = supabaseBrowser();
+    if (!sb) return;
     sb.auth.getUser().then(({ data }) => {
       setUser(data.user);
       setReady(true);
@@ -22,7 +24,7 @@ export function useUser() {
 
 export function signIn(provider: "google" | "github") {
   const next = window.location.pathname + window.location.search;
-  supabaseBrowser().auth.signInWithOAuth({
+  supabaseBrowser()?.auth.signInWithOAuth({
     provider,
     options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
   });
@@ -54,6 +56,7 @@ export function AuthButton() {
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
+  if (!supabaseBrowser()) return null;
   if (!ready) return <span className="label w-16 text-muted opacity-0">…</span>;
 
   const name = user?.user_metadata?.full_name || user?.user_metadata?.user_name || user?.email?.split("@")[0];
@@ -69,7 +72,7 @@ export function AuthButton() {
             <>
               <p className="mb-3 truncate text-xs text-muted">{user.email}</p>
               <button
-                onClick={() => supabaseBrowser().auth.signOut().then(() => setOpen(false))}
+                onClick={() => supabaseBrowser()?.auth.signOut().then(() => setOpen(false))}
                 className="px-btn w-full px-4 py-2 text-[11px]"
               >
                 Log out

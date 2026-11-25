@@ -47,7 +47,9 @@ export function CveChat({ id }: { id: string }) {
     setError("");
     setBusy(true);
     try {
-      const { data } = await supabaseBrowser().auth.getSession();
+      const sb = supabaseBrowser();
+      if (!sb) throw new Error("login not configured");
+      const { data } = await sb.auth.getSession();
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token ?? ""}` },

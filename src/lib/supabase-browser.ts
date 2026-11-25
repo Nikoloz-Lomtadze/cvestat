@@ -7,7 +7,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // Used only for login/logout; the session is kept in cookies and refreshed automatically.
 let client: SupabaseClient | null = null;
 
-export function supabaseBrowser(): SupabaseClient {
-  client ??= createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+/** Returns null if Supabase isn't configured, so a missing key hides login instead of crashing the page. */
+export function supabaseBrowser(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  client ??= createBrowserClient(url, key);
   return client;
 }
