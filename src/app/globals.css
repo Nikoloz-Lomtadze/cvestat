@@ -152,6 +152,16 @@ body {
   border-color: var(--pink);
   box-shadow: 0 0 0 2px #0b1a33, 0 0 14px rgb(255 92 138 / 0.45);
 }
+/* logo: the anglerfish's lure slowly pulses */
+.lure-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lure-glow 2.8s ease-in-out infinite;
+}
+@keyframes lure-glow {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
 /* header links */
 .nav-btn {
   color: var(--foreground);
@@ -231,4 +241,5 @@ body {
   .bubble, .trash { display: none; }
   .radar-comet { animation: none !important; stroke-dasharray: none; opacity: 0.8; }
   .radar-ping { animation: none !important; opacity: 0.5; }
+  .lure-glow { animation: none !important; opacity: 0.7; }
 }

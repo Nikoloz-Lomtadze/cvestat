@@ -114,3 +114,30 @@ export const SUN: SpriteArt = {
   ],
   palette: { Y: "#ffd86b" },
 };
+
+/** CVEStat mascot & logo: a deep-sea anglerfish with a glowing lure ("shining light on vulnerabilities"). */
+export const ANGLER: SpriteArt = {
+  rows: [
+    "..............sss.........",
+    ".............s...s........",
+    ".............s....s.......",
+    ".............s...gLg......",
+    ".............s..gLCLg.....",
+    ".........DDDDsDD.gLg......",
+    "......DDDHHHHHHHDD........",
+    "T...DDHHBBBBBBBBBHD.......",
+    "TT.DHBBBSBBBBBBBBBBD......",
+    "TTTDBBBBBBBBSBBYYYBBD.....",
+    ".TTDBBBBSBBBBBBYKYBBBD....",
+    "..TDBBBBBBBBBBBYYYBBBBD...",
+    ".TTDBBBBBBSBBBBBBDDDDDDDD.",
+    "TTTDBBBBBBBBBBBBDWMWMWMWD.",
+    "TT.DDBBBBBBBBBBBDMWMWMWMWD",
+    "T....DDBBBBBBBBBBBBBBBBBBD",
+    ".......DDDDDDDDDDDDDDDDDD.",
+  ],
+  // D outline, B/H/S body, Y eye, W teeth, M mouth, s lure stalk, L/C/g lure light, T tail
+  palette: { D: "#0b1430", H: "#6d8fd8", B: "#4566b0", S: "#7ea3e8", Y: "#ffe066", K: "#0b1a33", W: "#f4fbff", M: "#3b0f2f", s: "#9fc3e6", L: "#4fd8ff", C: "#ffffff", g: "#2b8fb3", T: "#3a5596" },
+};
+/** Centre of the lure light, in sprite pixels. */
+export const ANGLER_LURE = { x: 18.5, y: 4.5 };

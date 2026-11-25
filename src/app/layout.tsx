@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Link from "next/link";
 import { Suspense } from "react";
+import { AnglerLogo } from "@/components/AnglerLogo";
 import { AuthButton } from "@/components/auth";
 import { Links, NavLinks } from "@/components/NavLinks";
 import { Ocean } from "@/components/ocean/Ocean";
@@ -22,8 +23,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Ocean />
         <header className="sticky top-0 z-30 border-b-2 border-border bg-[#061428]/95 backdrop-blur">
           <nav className="mx-auto flex max-w-5xl items-center gap-2 px-3 py-3 sm:gap-6 sm:px-4">
-            <Link href="/" className="chroma font-pixel text-lg font-bold tracking-wider sm:text-2xl">
-              CVESTAT
+            <Link href="/" className="group flex shrink-0 items-center gap-1.5 sm:gap-2" aria-label="CVEStat home">
+              <AnglerLogo className="h-6 w-auto shrink-0 transition-transform group-hover:-translate-y-0.5 sm:h-9" />
+              <span className="chroma font-pixel text-base font-bold tracking-wider sm:text-2xl">CVESTAT</span>
             </Link>
             <div className="ml-auto flex items-center gap-1 whitespace-nowrap text-[10px] sm:gap-2 sm:text-[13px]">
               <Suspense fallback={<Links />}>
